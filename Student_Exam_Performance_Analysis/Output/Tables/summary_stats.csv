@@ -1,0 +1,121 @@
+"Var1","Var2","Freq"
+"","Hours_Studied","Min.   : 1.00  "
+"","Hours_Studied","1st Qu.:16.00  "
+"","Hours_Studied","Median :20.00  "
+"","Hours_Studied","Mean   :19.98  "
+"","Hours_Studied","3rd Qu.:24.00  "
+"","Hours_Studied","Max.   :44.00  "
+"","  Attendance","Min.   : 60.00  "
+"","  Attendance","1st Qu.: 70.00  "
+"","  Attendance","Median : 80.00  "
+"","  Attendance","Mean   : 80.02  "
+"","  Attendance","3rd Qu.: 90.00  "
+"","  Attendance","Max.   :100.00  "
+"","Parental_Involvement","Length:6378       "
+"","Parental_Involvement","Class :character  "
+"","Parental_Involvement","Mode  :character  "
+"","Parental_Involvement",NA
+"","Parental_Involvement",NA
+"","Parental_Involvement",NA
+"","Access_to_Resources","Length:6378       "
+"","Access_to_Resources","Class :character  "
+"","Access_to_Resources","Mode  :character  "
+"","Access_to_Resources",NA
+"","Access_to_Resources",NA
+"","Access_to_Resources",NA
+"","Extracurricular_Activities","Min.   :0.0000  "
+"","Extracurricular_Activities","1st Qu.:0.0000  "
+"","Extracurricular_Activities","Median :1.0000  "
+"","Extracurricular_Activities","Mean   :0.5969  "
+"","Extracurricular_Activities","3rd Qu.:1.0000  "
+"","Extracurricular_Activities","Max.   :1.0000  "
+""," Sleep_Hours","Min.   : 4.000  "
+""," Sleep_Hours","1st Qu.: 6.000  "
+""," Sleep_Hours","Median : 7.000  "
+""," Sleep_Hours","Mean   : 7.035  "
+""," Sleep_Hours","3rd Qu.: 8.000  "
+""," Sleep_Hours","Max.   :10.000  "
+"","Previous_Scores","Min.   : 50.00  "
+"","Previous_Scores","1st Qu.: 63.00  "
+"","Previous_Scores","Median : 75.00  "
+"","Previous_Scores","Mean   : 75.07  "
+"","Previous_Scores","3rd Qu.: 88.00  "
+"","Previous_Scores","Max.   :100.00  "
+"","Motivation_Level","Length:6378       "
+"","Motivation_Level","Class :character  "
+"","Motivation_Level","Mode  :character  "
+"","Motivation_Level",NA
+"","Motivation_Level",NA
+"","Motivation_Level",NA
+"","Internet_Access","Min.   :0.000  "
+"","Internet_Access","1st Qu.:1.000  "
+"","Internet_Access","Median :1.000  "
+"","Internet_Access","Mean   :0.924  "
+"","Internet_Access","3rd Qu.:1.000  "
+"","Internet_Access","Max.   :1.000  "
+"","Tutoring_Sessions","Min.   :0.000  "
+"","Tutoring_Sessions","1st Qu.:1.000  "
+"","Tutoring_Sessions","Median :1.000  "
+"","Tutoring_Sessions","Mean   :1.495  "
+"","Tutoring_Sessions","3rd Qu.:2.000  "
+"","Tutoring_Sessions","Max.   :8.000  "
+"","Family_Income","Length:6378       "
+"","Family_Income","Class :character  "
+"","Family_Income","Mode  :character  "
+"","Family_Income",NA
+"","Family_Income",NA
+"","Family_Income",NA
+"","Teacher_Quality","Length:6378       "
+"","Teacher_Quality","Class :character  "
+"","Teacher_Quality","Mode  :character  "
+"","Teacher_Quality",NA
+"","Teacher_Quality",NA
+"","Teacher_Quality",NA
+"","School_Type","Length:6378       "
+"","School_Type","Class :character  "
+"","School_Type","Mode  :character  "
+"","School_Type",NA
+"","School_Type",NA
+"","School_Type",NA
+"","Peer_Influence","Length:6378       "
+"","Peer_Influence","Class :character  "
+"","Peer_Influence","Mode  :character  "
+"","Peer_Influence",NA
+"","Peer_Influence",NA
+"","Peer_Influence",NA
+"","Physical_Activity","Min.   :0.000  "
+"","Physical_Activity","1st Qu.:2.000  "
+"","Physical_Activity","Median :3.000  "
+"","Physical_Activity","Mean   :2.973  "
+"","Physical_Activity","3rd Qu.:4.000  "
+"","Physical_Activity","Max.   :6.000  "
+"","Learning_Disabilities","Min.   :0.0000  "
+"","Learning_Disabilities","1st Qu.:0.0000  "
+"","Learning_Disabilities","Median :0.0000  "
+"","Learning_Disabilities","Mean   :0.1047  "
+"","Learning_Disabilities","3rd Qu.:0.0000  "
+"","Learning_Disabilities","Max.   :1.0000  "
+"","Parental_Education_Level","Length:6378       "
+"","Parental_Education_Level","Class :character  "
+"","Parental_Education_Level","Mode  :character  "
+"","Parental_Education_Level",NA
+"","Parental_Education_Level",NA
+"","Parental_Education_Level",NA
+"","Distance_from_Home","Length:6378       "
+"","Distance_from_Home","Class :character  "
+"","Distance_from_Home","Mode  :character  "
+"","Distance_from_Home",NA
+"","Distance_from_Home",NA
+"","Distance_from_Home",NA
+"","   Gender","Length:6378       "
+"","   Gender","Class :character  "
+"","   Gender","Mode  :character  "
+"","   Gender",NA
+"","   Gender",NA
+"","   Gender",NA
+"","  Exam_Score","Min.   : 55.00  "
+"","  Exam_Score","1st Qu.: 65.00  "
+"","  Exam_Score","Median : 67.00  "
+"","  Exam_Score","Mean   : 67.25  "
+"","  Exam_Score","3rd Qu.: 69.00  "
+"","  Exam_Score","Max.   :101.00  "

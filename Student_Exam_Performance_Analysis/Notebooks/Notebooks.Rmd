@@ -1,0 +1,512 @@
+---
+title: "Student Exam Performance Analysis"
+author: "Javier Kangditya"
+output: html_document
+---
+
+# Introduction
+
+## Project Overview
+The goal of this project is to analyze the factors that influence students' **Exam Scores** and to build a predictive model of final exam performance based on academic, lifestyle, and socio-economic features.
+
+## Dataset Description
+The dataset is obtained from Kaggle and contains **6,607 records and 20 features**, including:
+
+- Study hours  
+- Attendance  
+- Sleep hours  
+- Motivation  
+- Tutoring sessions  
+- Parental involvement  
+- School type  
+- Past exam scores  
+- Exam_Score (target variable)  
+
+## Project Goals
+1. Clean and preprocess the dataset  
+2. Explore the data through visualization (Exploratory Data Analysis)  
+3. Build predictive models for Exam Score  
+4. Evaluate model performance and identify important features  
+5. Provide insights and recommendations based on analysis
+
+---
+
+# 1. Data Cleaning
+```{r load_data, message=FALSE, warning=FALSE}
+# Load necessary libraries
+library(readxl)
+library(tidyverse)
+
+# Load dataset
+data <- read_excel("Data/Raw/StudentPerformanceFactors.xlsx")
+
+# Preview dataset
+glimpse(data)
+head(data)
+
+# Placeholder: handle missing values, duplicates, and correct data types
+```
+```{r data_cleaning}
+# Remove duplicates
+data <- data %>% distinct()
+
+# Drop rows with missing values
+data <- data %>% drop_na()
+
+# Convert Yes/No columns to numeric (1/0)
+yesno_cols <- sapply(data, function(x) all(x %in% c("Yes", "No")))
+data[, yesno_cols] <- lapply(data[, yesno_cols], function(x) ifelse(x == "Yes", 1, 0))
+
+# Check cleaned data
+glimpse(data)
+```
+```{r save_processed}
+library(openxlsx)
+
+# Save processed data
+dir.create("Data/Processed", showWarnings = FALSE)
+write.xlsx(data, "Data/Processed/StudentPerformanceFactors_clean.xlsx")
+```
+
+---
+
+# 2. Exploratory Data Analysis (EDA)
+```{r eda_analysis_complete, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(dplyr)
+library(corrplot)
+library(openxlsx)  
+
+# for saving figures and tables
+dir.create("output/figures", recursive = TRUE, showWarnings = FALSE)
+dir.create("output/tables", recursive = TRUE, showWarnings = FALSE)
+
+# -----------------------------
+# 1. Summary Statistics
+# -----------------------------
+summary_table <- data.frame(summary(data))
+
+# Save summary table to output/tables folder
+write.csv(summary_table, "output/tables/summary_stats.csv", row.names = FALSE)
+# This table includes min, max, mean, median, and quartiles for numeric features
+
+summary_table
+
+# -----------------------------
+# 2. Distribution of Exam Score
+# -----------------------------
+hist_plot <- ggplot(data, aes(x = Exam_Score)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", color = "black") +
+  theme_minimal() +
+  labs(title = "Distribution of Exam Scores", x = "Exam Score", y = "Count")
+
+# Save plot
+ggsave("output/figures/hist_exam_score.png", plot = hist_plot, width = 6, height = 4)
+
+hist_plot  
+
+# -----------------------------
+# 3. Study Hours vs Exam Score
+# -----------------------------
+study_plot <- ggplot(data, aes(x = Hours_Studied, y = Exam_Score)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  theme_minimal() +
+  labs(title = "Hours Studied vs Exam Score", x = "Hours Studied", y = "Exam Score")
+
+# Save plot
+ggsave("output/figures/study_vs_score.png", plot = study_plot, width = 6, height = 4)
+
+study_plot 
+
+# -----------------------------
+# 4. Sleep Hours vs Exam Score
+# -----------------------------
+sleep_plot <- ggplot(data, aes(x = Sleep_Hours, y = Exam_Score)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +
+  theme_minimal() +
+  labs(title = "Sleep Hours vs Exam Score", x = "Sleep Hours", y = "Exam Score")
+
+# Save plot
+ggsave("output/figures/sleep_vs_score.png", plot = sleep_plot, width = 6, height = 4)
+
+sleep_plot  
+
+# -----------------------------
+# 5. Correlation Matrix
+# -----------------------------
+numeric_data <- data %>% select(where(is.numeric))
+cor_matrix <- cor(numeric_data)
+
+# Save correlation matrix to file
+png("output/figures/correlation_matrix.png", width = 800, height = 600)
+corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black")
+dev.off()
+
+corrplot(cor_matrix, method = "color", type = "upper", tl.col = "black")
+# Correlation heatmap showing relationships among numeric features
+```
+
+```{r eda_categorical_full, message=FALSE, warning=FALSE}
+# ============================================================
+# EDA: Exam_Score vs Categorical 
+# ============================================================
+
+library(ggplot2)
+library(dplyr)
+library(openxlsx)  # for saving tables
+
+# List of categorical columns
+categorical_cols <- c(
+  "Parental_Involvement", "Access_to_Resources", "Motivation_Level",
+  "Family_Income", "Teacher_Quality", "School_Type", "Peer_Influence",
+  "Parental_Education_Level", "Distance_from_Home", "Gender", "Extracurricular_Activities", "Internet_Access", "Learning_Disabilities"
+)
+
+dir.create("output/figures", recursive = TRUE, showWarnings = FALSE)
+
+# Loop through each categorical column
+for(cat in categorical_cols){
+  
+  # Get all unique categories for the column
+  categories <- unique(data[[cat]])
+  message(paste("Categories in", cat, ":", paste(categories, collapse = ", ")))
+  
+  # -----------------------------
+  # Boxplot Exam_Score vs Category
+  # -----------------------------
+  plot <- ggplot(data, aes_string(x = cat, y = "Exam_Score")) +
+    geom_boxplot(fill = "steelblue", alpha = 0.7) +
+    theme_minimal() +
+    labs(title = paste("Exam Score vs", cat),
+         x = cat,
+         y = "Exam Score")
+  
+  # Save plot to output/figures folder
+  file_name <- paste0("output/figures/exam_score_vs_", tolower(cat), ".png")
+  ggsave(file_name, plot = plot, width = 6, height = 4)
+  
+  print(plot)  
+}
+```
+```{r avg_score_per_category_fixed, message=FALSE, warning=FALSE}
+library(dplyr)
+
+categorical_cols <- c(
+  "Parental_Involvement", "Access_to_Resources", "Motivation_Level",
+  "Family_Income", "Teacher_Quality", "School_Type", "Peer_Influence",
+  "Parental_Education_Level", "Distance_from_Home", "Gender",
+  "Tutoring", "Boolean_2", "Boolean_3"
+)
+
+dir.create("output/tables", recursive = TRUE, showWarnings = FALSE)
+
+for(cat in categorical_cols){
+  
+  # Check if column exists
+  if(!cat %in% colnames(data)){
+    message(paste("Column", cat, "not found in dataset. Skipping."))
+    next
+  }
+  
+  # Convert 0/1 boolean columns to factor
+  if(is.numeric(data[[cat]]) & length(unique(data[[cat]])) == 2){
+    data[[cat]] <- factor(data[[cat]], levels = c(0,1), labels = c("No","Yes"))
+  }
+  
+  # Calculate average Exam_Score per category
+  avg_table <- data %>%
+    group_by(.data[[cat]]) %>%
+    summarize(Average_Exam_Score = mean(Exam_Score, na.rm = TRUE),
+              Count = n())
+  
+  cat("\n=== Average Exam_Score by", cat, "===\n")
+  print(avg_table)
+  
+  # Save to CSV
+  file_name <- paste0("output/tables/avg_score_", tolower(cat), ".csv")
+  write.csv(avg_table, file_name, row.names = FALSE)
+}
+```
+
+---
+
+# 3.1. Feature Engineering
+```{r feature_engineering, message=FALSE, warning=FALSE}
+
+# =============================================
+# Feature Engineering
+# =============================================
+# This chunk performs the following tasks:
+# 1. Scaling numeric features to standardize the data
+# 2. Creating interaction features to capture combined effects
+# 3. Saving the processed dataset ready for modeling
+# =============================================
+
+library(dplyr)
+
+# Copy original data to preserve it
+data_fe <- data
+
+# -----------------------------
+# 1. Scale numeric features
+# -----------------------------
+numeric_cols <- c("Hours_Studied", "Sleep_Hours", "Previous_Scores", "Attendance")
+data_fe[numeric_cols] <- scale(data_fe[numeric_cols])
+# Standardize numeric features so mean=0 and sd=1
+
+# -----------------------------
+# 2. Create interaction features
+# -----------------------------
+data_fe <- data_fe %>%
+  mutate(
+    Study_Attendance = Hours_Studied * Attendance,
+    Sleep_Study = Sleep_Hours * Hours_Studied
+  )
+# Interaction features capture combined effects of study, motivation, sleep, and attendance
+
+# -----------------------------
+# 3. Save engineered dataset
+# -----------------------------
+write.csv(data_fe,
+          "Data/Processed/StudentPerformanceFactors_feature_engineered.csv",
+          row.names = FALSE)
+# Save the feature-engineered dataset for modeling
+
+# Preview the engineered dataset
+glimpse(data_fe)
+
+```
+
+---
+
+# 3.2. Interaction Features vs Exam Score
+```{r interaction_correlation, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+# List of interaction features to analyze
+interaction_features <- c("Study_Attendance", "Sleep_Study")
+
+# Loop through each feature
+for(feat in interaction_features){
+  
+  # Calculate Pearson correlation with Exam_Score
+  cor_val <- cor(data_fe[[feat]], data_fe$Exam_Score, use = "complete.obs")
+  message(paste("Correlation between", feat, "and Exam_Score:", round(cor_val, 3)))
+  
+  # Scatter plot with regression line
+  p <- ggplot(data_fe, aes_string(x = feat, y = "Exam_Score")) +
+    geom_point(alpha = 0.5, color = "steelblue") +
+    geom_smooth(method = "lm", color = "red", se = FALSE) +
+    theme_minimal() +
+    labs(
+      title = paste(feat, "vs Exam Score (Correlation:", round(cor_val, 2), ")"),
+      x = feat,
+      y = "Exam Score"
+    )
+  
+  # Save plot
+  plot_file <- paste0("output/figures/", tolower(feat), "_vs_exam_score.png")
+  ggsave(plot_file, plot = p, width = 6, height = 4)
+  
+  # Print plot
+  print(p)
+}
+```
+
+---
+
+# 3.3. Drop Irrelevant Interaction Features
+```{r drop_interaction_features, message=FALSE, warning=FALSE}
+
+# Study_Attendance and Sleep_Study show near-zero correlation with Exam_Score
+# Therefore, we drop them from the feature-engineered dataset for modeling
+
+# Drop the columns
+data_fe <- data_fe %>%
+  select(-c(Study_Attendance, Sleep_Study))
+
+# Check the updated dataset
+glimpse(data_fe)
+
+# Save updated dataset
+write.csv(data_fe,
+          "Data/Processed/StudentPerformanceFactors_feature_engineered_cleaned.csv",
+          row.names = FALSE)
+# Updated feature-engineered dataset with irrelevant interaction features removed
+```
+
+---
+
+# 4. Modeling
+```{r modeling_fixed, message=FALSE, warning=FALSE}
+
+library(caret)
+library(randomForest)
+library(xgboost)
+library(dplyr)
+
+set.seed(123)
+
+# -----------------------------
+# 1. Split data (Train/Test)
+# -----------------------------
+train_index <- createDataPartition(data_fe$Exam_Score, p = 0.8, list = FALSE)
+train_data <- data_fe[train_index, ]
+test_data <- data_fe[-train_index, ]
+
+# -----------------------------
+# 2. Linear Regression
+# -----------------------------
+lm_model <- lm(Exam_Score ~ ., data = train_data)
+lm_pred <- predict(lm_model, newdata = test_data)
+
+# Evaluation
+lm_rmse <- sqrt(mean((lm_pred - test_data$Exam_Score)^2))
+lm_r2 <- cor(lm_pred, test_data$Exam_Score)^2
+message(paste("Linear Regression RMSE:", round(lm_rmse, 2), "R²:", round(lm_r2, 2)))
+
+# -----------------------------
+# 3. Random Forest
+# -----------------------------
+rf_model <- randomForest(Exam_Score ~ ., data = train_data, ntree = 100)
+rf_pred <- predict(rf_model, newdata = test_data)
+
+# Evaluation
+rf_rmse <- sqrt(mean((rf_pred - test_data$Exam_Score)^2))
+rf_r2 <- cor(rf_pred, test_data$Exam_Score)^2
+message(paste("Random Forest RMSE:", round(rf_rmse, 2), "R²:", round(rf_r2, 2)))
+
+# Feature importance
+rf_importance <- importance(rf_model)
+rf_importance_df <- data.frame(Feature = rownames(rf_importance), Importance = rf_importance[,1])
+rf_importance_df <- rf_importance_df[order(-rf_importance_df$Importance), ]
+
+# Save feature importance table
+dir.create("output/tables", recursive = TRUE, showWarnings = FALSE)
+write.csv(rf_importance_df, "output/tables/rf_feature_importance.csv", row.names = FALSE)
+
+# -----------------------------
+# 4. XGBoost 
+# -----------------------------
+# Convert all features to numeric using model.matrix
+train_matrix <- model.matrix(Exam_Score ~ ., train_data)[,-1]  # remove intercept
+train_label <- train_data$Exam_Score
+
+test_matrix <- model.matrix(Exam_Score ~ ., test_data)[,-1]
+
+# Fit XGBoost
+xgb_model <- xgboost(data = train_matrix, label = train_label, 
+                     nrounds = 100, objective = "reg:squarederror", verbose = 0)
+xgb_pred <- predict(xgb_model, test_matrix)
+
+# Evaluation
+xgb_rmse <- sqrt(mean((xgb_pred - test_data$Exam_Score)^2))
+xgb_r2 <- cor(xgb_pred, test_data$Exam_Score)^2
+message(paste("XGBoost RMSE:", round(xgb_rmse, 2), "R²:", round(xgb_r2, 2)))
+```
+
+---
+
+# 5. Model Evaluation: Predicted vs Actual
+```{r evaluation_pred_vs_actual, message=FALSE, warning=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+# Combine predictions and actual values into one dataframe
+pred_df <- data.frame(
+  Actual = test_data$Exam_Score,
+  Linear_Regression = lm_pred,
+  Random_Forest = rf_pred,
+  XGBoost = xgb_pred
+)
+
+# List of models for loop
+model_names <- c("Linear_Regression", "Random_Forest", "XGBoost")
+
+# Ensure output folder exists
+dir.create("output/figures", recursive = TRUE, showWarnings = FALSE)
+
+# Loop through each model to plot Predicted vs Actual
+for(model in model_names){
+  
+  # Scatter plot
+  p <- ggplot(pred_df, aes_string(x = "Actual", y = model)) +
+    geom_point(alpha = 0.5, color = "steelblue") +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "red") +
+    theme_minimal() +
+    labs(
+      title = paste("Predicted vs Actual: ", gsub("_", " ", model)),
+      x = "Actual Exam Score",
+      y = "Predicted Exam Score"
+    )
+  
+  # Save plot
+  plot_file <- paste0("output/figures/pred_vs_actual_", tolower(model), ".png")
+  ggsave(plot_file, plot = p, width = 6, height = 4)
+  
+  # Print plot in HTML
+  print(p)
+}
+
+# Dashed red line = perfect prediction (Predicted = Actual)
+# Points near the line indicate good model performance
+```
+Save Trained Models
+```{r save_models, message=FALSE, warning=FALSE}
+
+dir.create("output/Models", recursive = TRUE, showWarnings = FALSE)
+
+# -----------------------------
+# 1. Save Linear Regression
+# -----------------------------
+saveRDS(lm_model, file = "output/Models/lm_model.rds")
+
+# -----------------------------
+# 2. Save Random Forest
+# -----------------------------
+saveRDS(rf_model, file = "output/Models/rf_model.rds")
+
+# -----------------------------
+# 3. Save XGBoost
+# -----------------------------
+saveRDS(xgb_model, file = "output/Models/xgb_model.rds")
+
+# All models saved as RDS files
+# Can be reloaded with readRDS() for future predictions or deployment
+```
+
+---
+
+# Conclusion & Insights
+
+## 1. Summary of Findings
+- **Exploratory Data Analysis (EDA):**  
+  - Numeric features such as `Hours_Studied`, `Attendance`, and `Previous_Scores` show the strongest correlation with `Exam_Score`.  
+  - Categorical variables (e.g., `Parental_Involvement`, `Motivation_Level`) had minimal impact on exam performance.  
+  - Outliers and missing values were handled during data cleaning.
+
+- **Feature Engineering:**  
+  - Interaction features `Study_Attendance` and `Sleep_Study` were created but later removed due to near-zero correlation with `Exam_Score`.  
+  - Numeric features were standardized to ensure uniform scale for modeling.
+
+- **Modeling Results:**  
+  - Linear Regression achieved the best performance (lowest RMSE, highest R²).  
+  - Random Forest and XGBoost performed well but did not outperform Linear Regression on this dataset.  
+  - Predicted vs Actual plots confirm Linear Regression predictions are closely aligned with actual exam scores.
+
+## 2. Practical Implications
+- Students’ **study hours and attendance** are key predictors of exam performance.  
+- Simple, interpretable models like Linear Regression can be used effectively for prediction and reporting.  
+- Feature importance from Random Forest provides additional insights into which variables matter most.
+
+## 3. Recommendations
+- Focus on increasing **study efficiency and consistent attendance** to improve exam performance.  
+- Consider interventions for students with low study hours or irregular attendance.  
+- Linear Regression can be deployed for quick predictions in school settings without complex model infrastructure.
+
